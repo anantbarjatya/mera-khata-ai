@@ -1,18 +1,19 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/Built%20For-Sarvam%20AI%20Internship-5C2D91?style=for-the-badge" />
+<img src="https://img.shields.io/badge/Voice%20AI-Hindi%20%7C%20Hinglish%20%7C%20English-FF6B35?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20SQLite-0A7EA4?style=for-the-badge" />
-<img src="https://img.shields.io/badge/Language-Hindi%20%7C%20Hinglish%20%7C%20English-FF6B35?style=for-the-badge" />
+<img src="https://img.shields.io/badge/AI-Sarvam%20AI-5C2D91?style=for-the-badge" />
 
 # 🧾 Mera Khata AI
 
 ### *Boliye, aur ledger khud update ho jaaye.*
 
-**India ke kirana stores ke liye ek voice-first AI udhaar ledger — powered by Sarvam AI.**
+**A voice-first AI-powered udhaar ledger for Indian Kirana Stores.**
 
 [🚀 Local Setup](#️-local-setup) · [✨ Features](#-features) · [🎯 Demo Commands](#-example-voice-commands) · [🏗️ Architecture](#️-architecture)
 
 </div>
+
 
 ---
 
