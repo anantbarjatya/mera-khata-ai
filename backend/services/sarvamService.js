@@ -1,81 +1,175 @@
 /**
  * sarvamService.js
- * ─────────────────────────────────────────────────────────────────────────────
- * Clean wrappers for all 4 Sarvam APIs used in BahiKhata:
- *   1. Vision      — invoice OCR
- *   2. STT (Saaras) — Hindi voice → text
- *   3. LLM (30B)   — Hindi text → structured JSON
- *   4. TTS (Bulbul) — confirmation text → audio
- *
- * Set USE_MOCK_APIS=true in .env to run fully offline without an API key.
- * ─────────────────────────────────────────────────────────────────────────────
  */
-
+const { PDFDocument } = require("pdf-lib");
 const fetch = require("node-fetch");
 const FormData = require("form-data");
-
+const AdmZip = require("adm-zip");
 
 const BASE_URL = "https://api.sarvam.ai";
+const DOC_BASE = "https://api.sarvam.ai/doc-digitization/job/v1";
 const API_KEY  = process.env.SARVAM_API_KEY;
 const USE_MOCK = process.env.USE_MOCK_APIS === "true";
 
-// ── Shared header helper ──────────────────────────────────────────────────────
 function authHeaders(extra = {}) {
   return { "api-subscription-key": API_KEY, ...extra };
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 1. VISION — parse wholesale invoice image → structured item list
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. VISION — async job-based pipeline
+// ═══════════════════════════════════════════════════════════════════════════
 
 const VISION_MOCK = [
-  { item_name: "Aata",   quantity: 10, unit: "kg",    price: 320 },
-  { item_name: "Chini",  quantity: 5,  unit: "kg",    price: 240 },
-  { item_name: "Tel",    quantity: 2,  unit: "litre", price: 270 },
-  { item_name: "Namak",  quantity: 4,  unit: "kg",    price: 88  },
+  { item_name: "Aata",  quantity: 10, unit: "kg",    price: 320 },
+  { item_name: "Chini", quantity: 5,  unit: "kg",    price: 240 },
+  { item_name: "Tel",   quantity: 2,  unit: "litre", price: 270 },
+  { item_name: "Namak", quantity: 4,  unit: "kg",    price: 88  },
 ];
 
-/**
- * @param {Buffer} imageBuffer  - raw image bytes (jpg/png)
- * @param {string} mimeType     - e.g. "image/jpeg"
- * @returns {Promise<Array<{item_name, quantity, unit, price}>>}
- */
 async function visionParseInvoice(imageBuffer, mimeType = "image/jpeg") {
   if (USE_MOCK) {
     await delay(1200);
     return VISION_MOCK;
   }
 
-  // Step 1: get raw OCR text from Sarvam Vision
-  const form = new FormData();
-  form.append("file", imageBuffer, { filename: "invoice.jpg", contentType: mimeType });
-  form.append("model", "sarvam-vision");
+  // JPG/PNG → PDF
+  const pdfBuffer = await imageToPdfBuffer(imageBuffer);
 
-  const ocrRes = await fetch(`${BASE_URL}/v1/document-digitization`, {
+  // 1. Create Job
+  const createRes = await fetch(DOC_BASE, {
     method: "POST",
-    headers: authHeaders(form.getHeaders()),
-    body: form,
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      job_parameters: {
+        language: "hi-IN",
+        output_format: "md",
+      },
+    }),
   });
-  if (!ocrRes.ok) throw new Error(`Vision OCR failed: ${ocrRes.status} ${await ocrRes.text()}`);
-  const ocrData = await ocrRes.json();
-  const rawText = ocrData?.pages?.map(p => p.text).join("\n") || ocrData?.text || "";
 
-  // Step 2: use LLM to turn raw OCR text → clean JSON array
+  const createData = await createRes.json();
+  if (!createRes.ok) {
+    throw new Error(`Create Job failed: ${JSON.stringify(createData)}`);
+  }
+
+  const jobId = createData.job_id;
+  console.log("✅ Job created:", jobId);
+
+  // 2. Get Upload URL
+  const uploadUrlRes = await fetch(`${DOC_BASE}/upload-files`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      job_id: jobId,
+      files: ["invoice.pdf"],
+    }),
+  });
+
+  const uploadUrlData = await uploadUrlRes.json();
+  if (!uploadUrlRes.ok) {
+    throw new Error(`Upload URL failed: ${JSON.stringify(uploadUrlData)}`);
+  }
+
+  const presignedUrl = uploadUrlData.upload_urls["invoice.pdf"].file_url;
+  console.log("📤 Upload URL received");
+
+  // 3. Upload PDF via presigned URL
+  // Azure Blob Storage requires x-ms-blob-type: BlockBlob header
+  const uploadRes = await fetch(presignedUrl, {
+    method: "PUT",
+    body: pdfBuffer,
+    headers: {
+      "x-ms-blob-type": "BlockBlob",
+      "Content-Type": "application/pdf",
+    },
+  });
+
+  if (!uploadRes.ok) {
+    const errText = await uploadRes.text();
+    throw new Error(`File upload failed: ${uploadRes.status} — ${errText}`);
+  }
+  console.log("✅ PDF uploaded");
+
+  // 4. Start Job
+  const startRes = await fetch(`${DOC_BASE}/${jobId}/start`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+
+  if (!startRes.ok) {
+    throw new Error(`Start Job failed: ${await startRes.text()}`);
+  }
+  console.log("🚀 Job started");
+
+  // 5. Poll Status
+  let state = "Running";
+  while (["Accepted", "Pending", "Running"].includes(state)) {
+    await delay(3000);
+
+    const statusRes = await fetch(`${DOC_BASE}/${jobId}/status`, {
+      headers: authHeaders(),
+    });
+
+    const statusData = await statusRes.json();
+    state = statusData.job_state;
+    console.log("⏳ Status:", state);
+    if (state === "Completed" || state === "PartiallyCompleted") {
+      console.log("📋 Full status response:", JSON.stringify(statusData, null, 2));
+    }
+  }
+
+  if (state !== "Completed" && state !== "PartiallyCompleted") {
+    throw new Error(`Job failed with state: ${state}`);
+  }
+
+  // 6. Get Download Presigned URL
+  const dlUrlRes = await fetch(`${DOC_BASE}/${jobId}/download-files`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({}),
+  });
+
+  const dlUrlData = await dlUrlRes.json();
+  if (!dlUrlRes.ok) {
+    throw new Error(`Get download URL failed: ${JSON.stringify(dlUrlData)}`);
+  }
+
+  // Pick first available download URL (document.zip)
+  const downloadUrls = dlUrlData.download_urls || {};
+  const firstFile = Object.keys(downloadUrls)[0];
+  if (!firstFile) {
+    throw new Error("No download URLs returned from Sarvam");
+  }
+
+  const presignedDownloadUrl = downloadUrls[firstFile].file_url;
+  console.log("📥 Download URL received for:", firstFile);
+
+  // 7. Download ZIP via presigned URL
+  const outputRes = await fetch(presignedDownloadUrl);
+
+  if (!outputRes.ok) {
+    const errBody = await outputRes.text();
+    throw new Error(`Download failed: ${outputRes.status} — ${errBody}`);
+  }
+
+  const zipBuffer = Buffer.from(await outputRes.arrayBuffer());
+  console.log("📦 Output ZIP downloaded");
+
+  // 7. OCR Text Extraction
+  const rawText = extractTextFromZip(zipBuffer);
+  console.log("📝 OCR text length:", rawText.length);
+
+  // 8. LLM → Inventory Items
   const items = await llmExtractInvoiceItems(rawText);
   return items;
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 2. STT — Hindi audio → transcript
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. STT
+// ═══════════════════════════════════════════════════════════════════════════
 
 const STT_MOCK = "Ramesh ne do kilo chini aur ek litre tel liya, udhaar pe likh lo";
 
-/**
- * @param {Buffer} audioBuffer  - raw audio bytes (wav/webm)
- * @param {string} mimeType     - e.g. "audio/wav"
- * @returns {Promise<string>}   - Hindi transcript
- */
 async function sttTranscribe(audioBuffer, mimeType = "audio/wav") {
   if (USE_MOCK) {
     await delay(800);
@@ -88,7 +182,7 @@ async function sttTranscribe(audioBuffer, mimeType = "audio/wav") {
   form.append("language_code", "hi-IN");
   form.append("with_timestamps", "false");
 
-const res = await fetch(`${BASE_URL}/speech-to-text`, {
+  const res = await fetch(`${BASE_URL}/speech-to-text`, {
     method: "POST",
     headers: authHeaders(form.getHeaders()),
     body: form,
@@ -98,14 +192,14 @@ const res = await fetch(`${BASE_URL}/speech-to-text`, {
   return data.transcript || "";
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 3. LLM — Hindi transcript → structured transaction JSON
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. LLM — transaction extraction
+// ═══════════════════════════════════════════════════════════════════════════
 
 const LLM_MOCK_TRANSACTION = {
-  customer_name:    "Ramesh",
+  customer_name: "Ramesh",
   items: [
-    { name: "chini", quantity: 2, unit: "kg"    },
+    { name: "chini", quantity: 2, unit: "kg" },
     { name: "tel",   quantity: 1, unit: "litre" },
   ],
   transaction_type: "udhaar",
@@ -116,11 +210,6 @@ const LLM_MOCK_INVOICE_ITEMS = [
   { item_name: "Chini", quantity: 5,  unit: "kg",    price: 240 },
 ];
 
-/**
- * Extract transaction details from Hindi sentence (Act 2)
- * @param {string} hindiText
- * @returns {Promise<{customer_name, items, transaction_type}>}
- */
 async function llmExtractTransaction(hindiText) {
   if (USE_MOCK) {
     await delay(600);
@@ -152,34 +241,9 @@ IMPORTANT CUSTOMER NAME RULES:
 - Never return "Unknown" if a person's name appears in the sentence.
 - Preserve Indian names exactly as spoken.
 
-Examples:
-"Anant ko do kilo aloo udhar diya"
-→ customer_name = "Anant"
-
-"Raju ne teen kilo aata liya"
-→ customer_name = "Raju"
-
-"Anju ko ek kilo chini di"
-→ customer_name = "Anju"
-
-Return "Unknown" ONLY if no person name exists.
-
 IMPORTANT ITEM RULES:
 - Keep common kirana item names in Hindi inventory format.
-- Do NOT translate:
-  aata → Aata
-  chini → Chini
-  tel → Tel
-  daal → Daal
-  chawal → Chawal
-  aloo → Aloo
-  kheera → Kheera
-  pyaz → Pyaz
-  tamatar → Tamatar
-  doodh → Doodh
-
-- Avoid returning generic English names like flour, sugar, potatoes, cucumber, onion, tomato when a common Hindi kirana name exists.
-`;
+- Do NOT translate: aata→Aata, chini→Chini, tel→Tel, daal→Daal, chawal→Chawal, aloo→Aloo, pyaz→Pyaz, tamatar→Tamatar, doodh→Doodh`;
 
   const res = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: "POST",
@@ -198,11 +262,6 @@ IMPORTANT ITEM RULES:
   return safeParseJSON(raw, LLM_MOCK_TRANSACTION);
 }
 
-/**
- * Extract item list from raw OCR text (Act 1, internal)
- * @param {string} rawText
- * @returns {Promise<Array<{item_name, quantity, unit, price}>>}
- */
 async function llmExtractInvoiceItems(rawText) {
   if (USE_MOCK) {
     await delay(500);
@@ -240,59 +299,115 @@ If a field is missing, use null. Return an empty array [] if no items found.`;
   return safeParseJSON(raw, []);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// 4. TTS (Bulbul) — Hindi confirmation text → audio buffer
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. TTS
+// ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * @param {string} hindiText
- * @returns {Promise<Buffer>}   - base64-encoded WAV audio
- */
 async function ttsSpeak(hindiText) {
   if (USE_MOCK) {
     await delay(700);
-    // Return a tiny silent WAV (so frontend audio player doesn't crash)
-    return SILENT_WAV_BASE64;  // real API returns base64 string, not Buffer
+    return SILENT_WAV_BASE64;
   }
 
-const res = await fetch(`${BASE_URL}/text-to-speech`, {
+  const res = await fetch(`${BASE_URL}/text-to-speech`, {
     method: "POST",
     headers: authHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
-  text: hindiText,
-  target_language_code: "hi-IN",
-  speaker: "priya",
-  model: "bulbul:v3"
-}),
+      text: hindiText,
+      target_language_code: "hi-IN",
+      speaker: "priya",
+      model: "bulbul:v3",
+    }),
   });
   if (!res.ok) throw new Error(`TTS failed: ${res.status} ${await res.text()}`);
   const data = await res.json();
-  // Sarvam returns base64 audio in audios[0]
   return data.audios?.[0] || "";
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // Helpers
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function imageToPdfBuffer(imageBuffer) {
+  const pdfDoc = await PDFDocument.create();
+
+  let image;
+  try {
+    image = await pdfDoc.embedJpg(imageBuffer);
+  } catch {
+    image = await pdfDoc.embedPng(imageBuffer);
+  }
+
+  const page = pdfDoc.addPage([image.width, image.height]);
+  page.drawImage(image, {
+    x: 0,
+    y: 0,
+    width: image.width,
+    height: image.height,
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
+}
+
+function extractTextFromZip(zipBuffer) {
+  const zip = new AdmZip(zipBuffer);
+  const entries = zip.getEntries();
+  let rawText = "";
+
+  // Try JSON first
+  const jsonEntry = entries.find(e => e.entryName.endsWith(".json"));
+  if (jsonEntry) {
+    try {
+      const jsonData = JSON.parse(jsonEntry.getData().toString("utf8"));
+      if (Array.isArray(jsonData)) {
+        rawText = jsonData.map(p => p.text || p.content || "").join("\n");
+      } else if (jsonData.pages) {
+        rawText = jsonData.pages.map(p => p.text || p.content || "").join("\n");
+      }
+    } catch (e) {
+      console.warn("JSON parse failed, trying .md");
+    }
+  }
+
+  // Fallback: .md file
+  if (!rawText.trim()) {
+    const mdEntry = entries.find(e => e.entryName.endsWith(".md"));
+    if (mdEntry) rawText = mdEntry.getData().toString("utf8");
+  }
+
+  // Last fallback: all text entries
+  if (!rawText.trim()) {
+    rawText = entries
+      .filter(e => !e.isDirectory)
+      .map(e => { try { return e.getData().toString("utf8"); } catch { return ""; } })
+      .join("\n");
+  }
+
+  return rawText;
+}
+
+// Silent WAV (used as mock TTS response)
+const SILENT_WAV_BASE64 =
+  "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function safeParseJSON(str, fallback) {
+function safeParseJSON(text, fallback) {
   try {
-    // Strip markdown code fences if LLM wraps output
-    const clean = str.replace(/```json|```/gi, "").trim();
+    const clean = text.replace(/```json|```/g, "").trim();
     return JSON.parse(clean);
   } catch {
-    console.error("JSON parse failed, using fallback. Raw:", str);
+    console.warn("JSON parse failed, returning fallback");
     return fallback;
   }
 }
 
-// Minimal 1-second silent WAV for mock mode
-const SILENT_WAV_BASE64 =
-  "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+// ═══════════════════════════════════════════════════════════════════════════
+// Exports
+// ═══════════════════════════════════════════════════════════════════════════
 
 module.exports = {
   visionParseInvoice,

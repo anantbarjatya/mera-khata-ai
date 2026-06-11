@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Package, Users, Receipt, Mic, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Receipt, Mic, Sparkles, ScanLine } from 'lucide-react';
 import './Sidebar.css';
 
 const NAV = [
@@ -8,6 +8,7 @@ const NAV = [
   { to: '/inventory',    icon: Package,          label: 'Inventory',     hi: 'इन्वेंटरी' },
   { to: '/customers',    icon: Users,            label: 'Customers',     hi: 'ग्राहक' },
   { to: '/transactions', icon: Receipt,          label: 'Transactions',  hi: 'लेनदेन' },
+  { to: '/raseed',       icon: ScanLine,         label: 'Raseed Scan',   hi: 'रसीद स्कैनर' },
 ];
 
 export default function Sidebar() {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { RefreshCw, Wifi, WifiOff, ScanLine } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import toast from 'react-hot-toast';
 
@@ -35,6 +36,7 @@ export default function Dashboard() {
   const [voiceHistory, setVoiceHistory] = useState([]);
   const [online,       setOnline]       = useState(null);
   const [loading,      setLoading]      = useState(true);
+  const navigate = useNavigate();
 
   const loadAll = useCallback(async () => {
     try {
@@ -190,6 +192,26 @@ const handleVoiceResult = useCallback((result) => {
         <motion.div className="dash-cell inventory-cell" variants={CARD}>
           <InventoryHealth inventory={inventory} />
         </motion.div>
+
+        {/* Raseed Scanner shortcut */}
+        <motion.div className="dash-cell raseed-shortcut-cell" variants={CARD}
+          onClick={() => navigate('/raseed')}
+          style={{ cursor: 'pointer' }}
+          whileHover={{ y: -3 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '24px 16px', textAlign: 'center', height: '100%' }}>
+            <div style={{ background: 'var(--saffron-light)', borderRadius: '50%', width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ScanLine size={26} color="var(--saffron)" strokeWidth={1.8} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Raseed Scanner</div>
+              <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>रसीद स्कैनर</div>
+              <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>Invoice photo se inventory auto-update</div>
+            </div>
+            <span style={{ fontSize: 11, background: 'var(--saffron)', color: 'white', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>
+              Sarvam Vision ✨
+            </span>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Offline overlay */}
@@ -207,4 +229,3 @@ const handleVoiceResult = useCallback((result) => {
     </div>
   );
 }
-

@@ -100,13 +100,20 @@ function getDB() {
   return {
     prepare: (sql) => makeStmt(sql),
     exec: (sql) => { db.run(sql); persist(); },
-    transaction(fn) {
-      return function() {
-        db.run("BEGIN");
-        try { fn(); db.run("COMMIT"); persist(); }
-        catch(e) { db.run("ROLLBACK"); throw e; }
-      };
-    },
+  
+  transaction(fn) {
+  return function(...args) {
+    try { db.run("BEGIN"); } catch(_) {}
+    try {
+      fn(...args);
+      try { db.run("COMMIT"); } catch(_) {}
+      persist();
+    } catch(e) {
+      try { db.run("ROLLBACK"); } catch(_) {}
+      throw e;
+    }
+  };
+},
   };
 }
 

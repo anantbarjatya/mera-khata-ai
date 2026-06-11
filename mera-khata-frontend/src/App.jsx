@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import InventoryPage from './pages/InventoryPage.jsx';
 import CustomersPage from './pages/CustomersPage.jsx';
 import TransactionsPage from './pages/TransactionsPage.jsx';
+import RaseedScanner from './pages/RaseedScanner.jsx';
 import './App.css';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/inventory"    element={<InventoryPage />} />
           <Route path="/customers"    element={<CustomersPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/raseed"       element={<RaseedScanner />} />
           <Route path="*"             element={<Navigate to="/" />} />
         </Routes>
       </main>

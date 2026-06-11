@@ -39,20 +39,30 @@ export const addTransaction = (txn) =>
   api.post('/transactions', txn).then(r => r.data);
 
 // ── Voice Pipeline ─────────────────────────────────────────────────────────
-/**
- * Send audio blob to voice-commit endpoint.
- * Returns: { transcript, extracted, customer, transaction, tts_audio_base64, tts_text }
- */
 export const voiceCommit = async (audioBlob) => {
   const formData = new FormData();
   formData.append('audio', audioBlob, 'recording.webm');
 
   const response = await api.post('/transactions/voice-commit', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    timeout: 60000, // voice pipeline can take longer
+    timeout: 60000,
   });
   return response.data;
 };
+
+// ── Raseed Scanner (Vision pipeline) ──────────────────────────────────────
+export const scanInvoice = async (imageFile) => {
+  const formData = new FormData();
+  formData.append('invoice', imageFile);
+  const response = await api.post('/sarvam/vision-invoice', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  });
+  return response.data;
+};
+
+export const bulkAddInventory = (items) =>
+  api.post('/inventory/bulk', { items }).then(r => r.data);
 
 // ── Health ─────────────────────────────────────────────────────────────────
 export const checkHealth = () => api.get('/health').then(r => r.data);

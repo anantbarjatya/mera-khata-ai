@@ -44,3 +44,4 @@ initDB().then(() => {
   console.error("Failed to init DB:", err);
   process.exit(1);
 });
+console.log("KEY LOADED:", !!process.env.SARVAM_API_KEY);
