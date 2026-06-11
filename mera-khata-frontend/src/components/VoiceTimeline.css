@@ -1,0 +1,137 @@
+.vt-root {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1.5px solid var(--border);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.vt-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.vt-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 2px;
+}
+
+.vt-count {
+  margin-left: auto;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.vt-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 20px 0;
+}
+.vt-empty-icon { font-size: 28px; }
+.vt-empty-sub  { font-size: 11px; opacity: 0.7; }
+
+.vt-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.vt-entry {
+  display: flex;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.vt-line-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.vt-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--saffron);
+  border: 2px solid white;
+  outline: 2px solid rgba(244,114,27,0.3);
+  flex-shrink: 0;
+}
+
+.vt-line {
+  width: 1px;
+  flex: 1;
+  min-height: 12px;
+  background: var(--border);
+  margin: 3px 0;
+}
+
+.vt-content {
+  padding-bottom: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.vt-transcript {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+  margin-bottom: 5px;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vt-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.vt-chip {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.vt-chip-blue    { background: #EEF2FF; color: #4338CA; }
+.vt-chip-saffron { background: var(--saffron-light); color: #C2500D; }
+.vt-chip-green   { background: var(--green-bg); color: var(--green); }
+.vt-chip-red     { background: var(--red-bg); color: var(--red); }
+
+.vt-time {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: auto;
+}

@@ -1,0 +1,143 @@
+.ih-root {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1.5px solid var(--border);
+  height: 100%;
+}
+
+.ih-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.ih-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ih-subtitle-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ih-legend {
+  display: flex;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+.ih-bar-wrap {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--border);
+  margin-bottom: 16px;
+  gap: 2px;
+}
+
+.ih-bar-seg {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 4px;
+}
+
+.ih-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ih-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.ih-item-healthy  { background: #F4FBF6; border-color: rgba(45,106,79,0.12); }
+.ih-item-low      { background: var(--ochre-bg); border-color: rgba(232,197,71,0.2); }
+.ih-item-critical { background: var(--red-bg);   border-color: rgba(192,57,43,0.15); }
+
+.ih-item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ih-item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ih-item-qty {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ih-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ih-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(0,0,0,0.07);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ih-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+.ih-fill-healthy  { background: var(--green); }
+.ih-fill-low      { background: var(--ochre); }
+.ih-fill-critical { background: var(--red);   }
+
+.ih-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.badge-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ih-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 20px 0;
+}

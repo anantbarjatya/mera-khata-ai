@@ -1,0 +1,186 @@
+.sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0;
+  z-index: 100;
+  border-right: 3px solid var(--saffron);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+
+.brand-icon {
+  width: 36px; height: 36px;
+  background: var(--saffron);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #FAF7F2;
+  line-height: 1.2;
+}
+
+.brand-tag {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand-ai-badge {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(244, 114, 27, 0.2);
+  border: 1px solid rgba(244, 114, 27, 0.4);
+  color: var(--saffron);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item { text-decoration: none; display: block; }
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(250, 247, 242, 0.5);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-inner:hover {
+  color: rgba(250, 247, 242, 0.85);
+  background: rgba(255,255,255,0.05);
+}
+
+.nav-inner.active {
+  color: #FAF7F2;
+  background: rgba(244, 114, 27, 0.15);
+}
+
+.nav-active-bar {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: var(--saffron);
+  border-radius: 0 3px 3px 0;
+}
+
+.nav-labels {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.nav-en {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.nav-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.sidebar-footer {
+  padding: 20px 20px 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.powered-by {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(250,247,242,0.35);
+}
+
+.sarvam-badge {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 20px;
+}
+
+.footer-tagline {
+  font-size: 10px;
+  color: rgba(250,247,242,0.2);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile nav */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--ink);
+  border-top: 2px solid var(--saffron);
+  z-index: 100;
+  padding: 8px 0 env(safe-area-inset-bottom);
+}
+
+.mobile-nav-item {
+  text-decoration: none;
+  flex: 1;
+  display: flex;
+}
+
+.mobile-nav-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  color: rgba(250,247,242,0.4);
+  font-size: 10px;
+  transition: color 0.2s;
+}
+
+.mobile-nav-inner.active { color: var(--saffron); }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .mobile-nav { display: flex; }
+}

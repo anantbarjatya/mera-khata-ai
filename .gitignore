@@ -1,0 +1,12 @@
+
+backend/db/*.json
+backend/db/*.db
+node_modules
+.env
+.env.local
+.env.*
+dist
+build
+uploads
+.DS_Store
+*.log

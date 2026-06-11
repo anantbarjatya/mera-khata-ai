@@ -1,0 +1,81 @@
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.insight-card {
+  border-radius: 14px;
+  padding: 16px;
+  border: 1.5px solid transparent;
+  cursor: default;
+  transition: box-shadow 0.2s;
+}
+.insight-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+.insight-saffron { background: var(--saffron-light); border-color: rgba(244,114,27,0.25); }
+.insight-red     { background: var(--red-bg);       border-color: rgba(192,57,43,0.2);   }
+.insight-ochre   { background: var(--ochre-bg);     border-color: rgba(232,197,71,0.3);  }
+.insight-green   { background: var(--green-bg);     border-color: rgba(45,106,79,0.2);   }
+
+.insight-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.insight-icon-wrap {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.insight-saffron .insight-icon-wrap { background: rgba(244,114,27,0.15); color: var(--saffron); }
+.insight-red     .insight-icon-wrap { background: rgba(192,57,43,0.12);  color: var(--red); }
+.insight-ochre   .insight-icon-wrap { background: rgba(232,197,71,0.2);  color: #92701A; }
+.insight-green   .insight-icon-wrap { background: rgba(45,106,79,0.15);  color: var(--green); }
+
+.insight-labels {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.insight-label-en {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+
+.insight-label-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.insight-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.insight-sub {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .insights-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 520px) {
+  .insights-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,47 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:    #FAF7F2;
+  --ink:      #1A1A2E;
+  --ink-soft: #2E2E4A;
+  --saffron:  #F4721B;
+  --saffron-glow: rgba(244, 114, 27, 0.25);
+  --saffron-light: #FEE8D6;
+  --green:    #2D6A4F;
+  --green-bg: #D8F3DC;
+  --ochre:    #E8C547;
+  --ochre-bg: #FFF8DC;
+  --red:      #C0392B;
+  --red-bg:   #FDECEA;
+  --border:   rgba(26, 26, 46, 0.10);
+  --muted:    #8888AA;
+  --sidebar-w: 240px;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Khata gridline texture on paper backgrounds */
+.khata-bg {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Mono numbers everywhere */
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Utility */
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

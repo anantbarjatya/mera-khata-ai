@@ -1,0 +1,138 @@
+.tf-root {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1.5px solid var(--border);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tf-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.tf-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.tf-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.tf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tf-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--paper);
+  cursor: default;
+  transition: border-color 0.2s, background 0.2s;
+}
+.tf-card:hover {
+  border-color: rgba(244,114,27,0.25);
+  background: white;
+}
+
+.tf-icon-wrap {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.tf-icon-wrap.credit { background: var(--green-bg); color: var(--green); }
+.tf-icon-wrap.debit  { background: var(--red-bg);   color: var(--red);   }
+
+.tf-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tf-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tf-notes {
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.tf-time {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.tf-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.tf-amount {
+  font-size: 14px;
+  font-weight: 700;
+}
+.tf-amount.credit { color: var(--green); }
+.tf-amount.debit  { color: var(--red);   }
+
+.tf-type-tag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.tf-type-tag.credit { background: var(--green-bg); color: var(--green); }
+.tf-type-tag.debit  { background: var(--red-bg);   color: var(--red);   }
+
+.tf-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 20px 0;
+}
+.tf-empty-sub { font-size: 11px; opacity: 0.7; }
