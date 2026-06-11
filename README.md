@@ -4,6 +4,8 @@
 <img src="https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20SQLite-0A7EA4?style=for-the-badge" />
 <img src="https://img.shields.io/badge/AI-Sarvam%20AI-5C2D91?style=for-the-badge" />
 
+<img src="https://img.shields.io/badge/OCR-Sarvam%20Document%20Intelligence-blue?style=for-the-badge" />
+<img src="https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-black?style=for-the-badge" />
 # 🧾 Mera Khata AI
 
 ### *Boliye, aur ledger khud update ho jaaye.*
@@ -84,6 +86,108 @@ Sarvam LLM extracts structured data from raw speech:
 Supports **Hindi**, **Hinglish**, and **English** — naturally.
 
 ---
+🧾 AI-Powered Raseed Scanner (NEW)
+
+Upload a supplier invoice and let AI automatically update your inventory.
+
+Workflow
+📸 Upload invoice image
+📄 Convert image → PDF
+🤖 Sarvam Document Intelligence extracts OCR text
+🧠 Sarvam LLM converts OCR output into structured inventory items
+📦 Inventory is automatically updated
+
+Example Output:
+
+[
+  {
+    "item_name": "Aata",
+    "quantity": 10,
+    "unit": "kg",
+    "price": 320
+  },
+  {
+    "item_name": "Chini",
+    "quantity": 5,
+    "unit": "kg",
+    "price": 240
+  }
+]
+Why it matters
+
+Most kirana shopkeepers receive supplier invoices daily.
+
+Instead of manually entering stock:
+
+Scan invoice
+AI extracts products
+Inventory updates automatically
+
+Saving time and reducing human errors.
+
+🌐 Live Demo
+Frontend
+
+https://mera-khata-ai.vercel.app
+
+Backend
+
+https://mera-khata-ai.onrender.com/api/health
+
+🚀 AI Pipeline
+Voice Transaction Flow
+
+Voice Input
+→ Sarvam STT
+→ Sarvam LLM
+→ Ledger Update
+→ Inventory Update
+→ Sarvam TTS
+→ Audio Confirmation
+
+Invoice Flow
+
+Invoice Image
+→ PDF Conversion
+→ Sarvam Document Intelligence
+→ OCR Text
+→ Sarvam LLM Extraction
+→ Inventory Update
+
+📈 Impact
+Before
+
+❌ Manual notebooks
+
+❌ Missing entries
+
+❌ Inventory mismatch
+
+❌ No transaction history
+
+❌ Time-consuming bookkeeping
+
+After
+
+✅ Voice-based bookkeeping
+
+✅ AI-powered invoice processing
+
+✅ Automated inventory updates
+
+✅ Digital customer ledger
+
+✅ Real-time transaction history
+
+🏆 Why This Project Matters
+
+India has over 12 million kirana stores.
+
+Most still rely on handwritten credit records and manual inventory tracking.
+
+Mera Khata AI demonstrates how multilingual Indian AI models can modernize small businesses using natural voice interactions and intelligent document processing.
+
+Built specifically for real-world Indian retail workflows using Sarvam AI
 
 ### 🔊 AI Voice Confirmation
 
